@@ -46,6 +46,7 @@ export const updateUserSchema = z.object({
     .toUpperCase(),
     email: z
     .email("Email inválido")
+    .or(z.literal(''))
     .nullish(),
     password: z
     .string()
@@ -55,15 +56,18 @@ export const updateUserSchema = z.object({
     .string("Digite apenas números")
     .min(10, "Telefone deve ter no mínimo 10 dígitos")
     .max(14, "Telefone deve ter no máximo 14 dígitos")
+    .or(z.literal(''))
     .nullish(),
     experience: z
     .string()
     .min(10, "Experiência deve ter no mínimo 10 caracteres")
     .max(600, "Experiência deve ter no máximo 600 caracteres")
+    .or(z.literal(''))
     .nullish(),
     education: z
     .string()
     .min(10, "Educação deve ter no mínimo 10 caracteres")
     .max(600, "Educação deve ter no máximo 600 caracteres")
+    .or(z.literal(''))
     .nullish()
 });

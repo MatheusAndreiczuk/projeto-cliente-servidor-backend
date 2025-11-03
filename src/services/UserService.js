@@ -21,8 +21,8 @@ export class UserService {
     }
 
     async deleteUser(id){
-        const result = await this.userRepository.deleteUser(id);
-        return result;
+        const message = await this.userRepository.deleteUser(id);
+        return message;
     }
 
     async loginUser(userData){
