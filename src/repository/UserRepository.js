@@ -45,7 +45,7 @@ export class UserRepository {
         return {message};
     }
 
-    async loginUser(username) {
+    async getUserByUsername(username) {
         const user = await User.findOne({
             where: { username }
         })

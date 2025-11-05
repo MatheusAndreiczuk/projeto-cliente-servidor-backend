@@ -25,8 +25,8 @@ export class UserService {
         return message;
     }
 
-    async loginUser(username){
-        const user = await this.userRepository.loginUser(username);
+    async getUserByUsername(username){
+        const user = await this.userRepository.getUserByUsername(username);
         return user;
     }
 }

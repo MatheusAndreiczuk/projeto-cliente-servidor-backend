@@ -20,7 +20,7 @@ export class UserController {
         try {
             const body = { ...req.body };
             const requestData = createUserSchema.parse(body);
-            const userExists = await this.userService.loginUser(requestData.username)
+            const userExists = await this.userService.getUserByUsername(requestData.username)
 
             if (userExists) {
                 return res.status(409).json({ message: "User already exists" })

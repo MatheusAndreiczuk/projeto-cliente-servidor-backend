@@ -11,7 +11,7 @@ export class LoginController{
         try{
             const { username, password } = req.body
 
-            const existsUser = await this.userService.loginUser(username)
+            const existsUser = await this.userService.getUserByUsername(username)
             const existsCompany = await this.companyService.getCompanyByUsername(username)
 
             const jwtSecret = process.env.JWT_SECRET;
@@ -25,7 +25,7 @@ export class LoginController{
                 return res.status(401).json({ message: "Invalid credentials" })
             }
 
-            const entity = existsUser || existsCompany;
+            let entity = existsUser || existsCompany;
             if (!entity) {
                 return res.status(401).json({ message: "Invalid credentials" })
             }
@@ -35,7 +35,22 @@ export class LoginController{
                 return res.status(401).json({ message: "Invalid credentials" })
             }
 
-            const token = jwt.sign({ sub: entity.id }, jwtSecret, { expiresIn: parseInt(jwtExpiresIn) });
+            let role
+            if(entity === existsCompany){
+                role = "company"
+            } else {
+                role = "user"
+            }
+
+            const payloadToken = {
+                sub: entity.id,
+                role: role, 
+                username: entity.username
+            }
+
+            console.log("Generating JWT token with payload:", payloadToken);
+
+            const token = jwt.sign(payloadToken, jwtSecret, { expiresIn: parseInt(jwtExpiresIn) });
             return res.status(200).json({ token, expires_in: parseInt(jwtExpiresIn) });
             
         }catch(error){
