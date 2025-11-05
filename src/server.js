@@ -1,8 +1,14 @@
 import dotenv from 'dotenv'
-dotenv.config({path: '../.env'})
+dotenv.config() 
+
+console.log('JWT_SECRET:', process.env.JWT_SECRET ? 'Carregado' : 'Não encontrado');
+
 import express from "express";
-import router from "./routes/userRoutes.js";
+import router from "./routes/index.ts";
 import cors from "cors";
+import { dbReady } from './database/db.js';
+
+await dbReady;
 
 const app = express();
 

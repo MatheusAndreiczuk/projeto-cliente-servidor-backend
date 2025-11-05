@@ -1,7 +1,6 @@
 import { createUserSchema, updateUserSchema } from "../schemas/userSchema.js";
 import { UserService } from "../services/UserService.js";
 import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
 
 export class UserController {
     constructor() {
@@ -21,17 +20,17 @@ export class UserController {
         try {
             const body = { ...req.body };
             const requestData = createUserSchema.parse(body);
-            const userExists = await this.userService.loginUser(requestData)
+            const userExists = await this.userService.loginUser(requestData.username)
+
+            if (userExists) {
+                return res.status(409).json({ message: "User already exists" })
+            }
 
             const hashed = await bcrypt.hash(requestData.password, 10);
             requestData.password = hashed;
 
-            if (userExists) {
-                res.status(409).json({ message: "User already exists" })
-            } else {
-                await this.userService.createUser(requestData);
-                res.status(201).json({ message: "Created" });
-            }
+            await this.userService.createUser(requestData);
+            return res.status(201).json({ message: "Created" });
         } catch (error) {
             if (error.name === 'ZodError') {
                 return res.status(422).json({
@@ -41,34 +40,8 @@ export class UserController {
                 });
             }
             console.error('createUser error:', error);
-            res.status(500).json({ error: "Internal Server Error" });
+            return res.status(500).json({ error: "Internal Server Error" });
         }
-    }
-
-    async loginUser(req, res) {
-        const user = await this.userService.loginUser(req.body)
-        const { password, username } = req.body
-
-        if (!user) {
-            res.status(401).json({ message: "Invalid credentials" })
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-
-        if (!isMatch) {
-            res.status(401).json({ message: "Invalid credentials" })
-        }
-
-        const jwtSecret = process.env.JWT_SECRET;
-        const jwtExpiresIn = process.env.JWT_EXPIRES_IN || '3600';
-
-        if (!jwtSecret) {
-            throw new Error("Não conseguiu pegar o jwt secret");
-        }
-
-        const token = jwt.sign({ sub: user.id }, jwtSecret, { expiresIn: parseInt(jwtExpiresIn) });
-
-        res.status(200).json({ token, expires_in: parseInt(process.env.JWT_EXPIRES_IN) });
     }
 
     async getUserByID(req, res) {
@@ -77,14 +50,14 @@ export class UserController {
             const user = await this.userExistsById(reqId)
 
             if (user == null) {
-                res.status(404).json({ message: "User not found" })
+                return res.status(404).json({ message: "User not found" })
             }
 
             delete user.id
             delete user.password
-            res.status(200).json(user)
+            return res.status(200).json(user)
         } catch (error) {
-            res.status(500).json({ message: error.message })
+            return res.status(500).json({ message: error.message })
         }
     }
 
@@ -98,12 +71,12 @@ export class UserController {
             const user = await this.userExistsById(req.userID)
 
             if (user == null) {
-                res.status(404).json({ message: "User not found" })
+                return res.status(404).json({ message: "User not found" })
             }
 
             const updatedUser = await this.userService.updateUser(req.userID, requestData);
             if (updatedUser) {
-                res.status(200).json(updatedUser)
+                return res.status(200).json()
             }
         } catch (error) {
             if (error.name === 'ZodError') {
@@ -113,6 +86,7 @@ export class UserController {
                     details: error.issues?.map(i => ({ path: i.path.join('.'), message: i.message })) || []
                 });
             }
+            return res.status(500).json({ message: error.message })
         }
     }
 
@@ -122,14 +96,10 @@ export class UserController {
         const user = await this.userExistsById(idReq)
 
         if (user == null) {
-            res.status(404).json({ message: "User not found" })
+            return res.status(404).json({ message: "User not found" })
         }
 
         const deletedMessage = await this.userService.deleteUser(idReq)
-        res.status(200).json(deletedMessage)
-    }
-
-    async logoutUser(req, res) {
-        res.status(200).json({ message: "OK" })
+        return res.status(200).json(deletedMessage)
     }
 }

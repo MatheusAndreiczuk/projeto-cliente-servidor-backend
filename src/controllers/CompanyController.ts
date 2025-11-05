@@ -1,23 +1,25 @@
 import { companySchema } from "../schemas/companySchema.ts";
 import { CompanyService } from "../services/CompanyService.ts";
 import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
-import { request, response } from "express";
+import { Request, Response } from "express";
 import { ZodError } from "zod";
 
 export class CompanyController {
     constructor (private service: CompanyService){}
 
-    async createCompany(req: request, res: response){
+    async createCompany(req: Request, res: Response){
         try{
             const body = req.body
             const requestBody = companySchema.parse(body)
 
-            const { name, username } = await this.service.getCompanyByUsername(requestBody.username)
-            if(name){
-                res.status(409).json({ message: "Company name already exists" })
-            } else if(username == requestBody.username){
-                res.status(409).json({ message: "Username already exists" })
+            const company = await this.service.getCompanyByUsername(requestBody.username)
+            if(company){
+                return res.status(409).json({ message: "Username already exists" })
+            }
+
+            const companyByName = await this.service.getCompanyByName(requestBody.name)
+            if (companyByName && companyByName.name == requestBody.name) {
+                return res.status(409).json({ message: "Company name already exists" });
             }
 
             const hashedPassword = await bcrypt.hash(requestBody.password, 10)
@@ -25,43 +27,23 @@ export class CompanyController {
 
             const createdUser = await this.service.createCompany(requestBody)
             if(createdUser){
-                res.status(201).json({ message: "Created" })
+                return res.status(201).json({ message: "Created" })
             }
-        }catch(err){
-            if(err instanceof ZodError){
-                res.status(422).json({ message: "One or more fields are incorrect "})
+        }catch(error){
+            if(error instanceof ZodError){
+                return res.status(422).json({
+                    message: 'ValidationError',
+                    code: 'UNPROCESSABLE',
+                    details: error.issues?.map(i => ({ path: i.path.join('.'), message: i.message })) || []
+                });
             }
+            return res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error" })
         }
     }
 
-    async loginCompany(req: request, res: response) {
-        try {
-            const body = req.body
-            const company = await this.service.getCompanyByUsername(body.username)
-
-            if (!company) {
-                return res.status(401).json({ message: "Invalid credentials" })
-            }
-
-            const isMatch = await bcrypt.compare(company.password, body.password)
-            if (!isMatch) {
-                return res.status(401).json({ message: "Invalid credentials" })
-            }
-
-            const jwtSecret = process.env.JWT_SECRET;
-            const jwtExpiresIn = process.env.JWT_EXPIRES_IN || '3600';
-
-            const token = jwt.sign({ sub: company.id }, { jwtSecret }, { expiresIn: parseInt(jwtExpiresIn) })
-            res.status(200).json( {token, expires_in: parseInt(jwtExpiresIn)} )
-        } catch (err) {
-            res.status(500).json({message: "Ocorreu um erro inesperado"})
-        }
-    }
-
-    async getCompanyById(req: request, res: response){
+    async getCompanyById(req: Request, res: Response){
         try{
-            const body = req.body
-            const companyId = req.userID
+            const companyId = (req as any).userID
 
             const company = await this.service.getCompanyById(companyId)
 
@@ -70,9 +52,52 @@ export class CompanyController {
             }
 
             delete company.id
-            res.status(200).json(company)
-        }catch(err){
-
+            delete company.password
+            return res.status(200).json(company)
+        }catch(error){
+            return res.status(500).json({message: "Internal Server Error"})
         }
+    }
+
+    async updateCompany (req: Request, res: Response){
+        try {
+            const body = req.body
+            const companyId = (req as any).userID
+            const requestBody = companySchema.parse(body)
+            const { password } = requestBody
+            const passwordHashed = await bcrypt.hash(password, 10)
+            requestBody.password = passwordHashed
+
+            const companyExists = await this.service.getCompanyById(companyId)
+            if(!companyExists){
+                return res.status(404).json({ message: "Company not found "})
+            }
+
+            const result = await this.service.updateCompany(requestBody, companyId)
+
+            if(!result){
+                return res.status(500).json({ message: "Internal Server Error" })
+            }
+
+            return res.status(200).json({ message: "Updated" })
+        } catch(error){
+           if (error instanceof ZodError) {
+                return res.status(422).json({
+                    message: 'ValidationError',
+                    code: 'UNPROCESSABLE',
+                    details: error.issues?.map(i => ({ path: i.path.join('.'), message: i.message })) || []
+                });
+            }
+            return res.status(500).json({ message: (error as Error).message })
+        }
+    }
+
+    async deleteCompany(req: Request, res: Response){
+        const deleteMessage = await this.service.getCompanyById((req as any).userID)
+        if(!deleteMessage){
+            return res.status(404).json({ message: "Company not found" })
+        }
+        await this.service.deleteCompany((req as any).userID)
+        return res.status(200).json({ message: "Deleted successfully" })
     }
 }

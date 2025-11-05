@@ -12,13 +12,11 @@ export const companySchema = z.object({
     username: z
     .string()
     .trim()
-    .regex(/[^a-zA-Z0-9]/g)
     .min(3, "Deve ter no mínimo 3 caracteres")
     .max(20, "Deve ter no máximo 20 caracteres"),
     password: z
     .string()
     .trim()
-    .regex(/[^a-zA-Z0-9]/g)
     .min(3, "Deve ter no mínimo 3 caracteres")
     .max(20, "Deve ter no máximo 20 caracteres"),
     street: z

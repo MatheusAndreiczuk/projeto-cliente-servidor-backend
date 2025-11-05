@@ -2,11 +2,7 @@ import User from "../models/User.js";
 import database from "../database/db.js";
 
 export class UserRepository {
-    constructor() {
-        database.sync().catch((err) => {
-            console.error("Database sync failed:", err);
-        });
-    }
+    constructor() {}
 
     async createUser(userData) {
         const user = await User.create(userData);
@@ -23,7 +19,7 @@ export class UserRepository {
     }
 
     async updateUser(id, updateData) {
-        const [rowsAffected, [dataAffected]] = await User.update(
+        await User.update(
             {
                 name: updateData.name,
                 email: updateData.email,
@@ -33,12 +29,12 @@ export class UserRepository {
                 phone: updateData.phone
             },
             {
-                where: { id },
-                returning: true
-            },
+                where: { id }
+            }
         )
-        const updatedUser = dataAffected;
-        return updatedUser;
+        
+        const updatedUser = await User.findByPk(id);
+        return updatedUser ? updatedUser.toJSON() : null;
     }
 
     async deleteUser(id) {
@@ -49,12 +45,10 @@ export class UserRepository {
         return {message};
     }
 
-    async loginUser(userData) {
-        const { username, password } = userData;
+    async loginUser(username) {
         const user = await User.findOne({
-            where: { username: username }
+            where: { username }
         })
-
-        return user;
+        return user ? user.toJSON() : null;
     }
 }

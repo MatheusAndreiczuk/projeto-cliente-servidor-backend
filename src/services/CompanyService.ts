@@ -16,8 +16,13 @@ export class CompanyService {
     }
 
     async getCompanyByUsername(username: string){
-        const company = await this.repository.getCompanyByUsername(username)
-        return company
+        const company = await this.repository.getCompanyByUsername(username);
+        return company;
+    }
+
+    async getCompanyByName(name: string){
+        const company = await this.repository.getCompanyByName(name);
+        return company;
     }
 
     async updateCompany(companyData: CompanySchema, id: number){
