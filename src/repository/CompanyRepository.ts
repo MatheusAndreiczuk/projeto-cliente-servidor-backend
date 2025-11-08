@@ -1,5 +1,5 @@
 import Company from "../models/Company.js";
-import { CompanySchema } from "../schemas/companySchema.js";
+import { CompanySchema, CompanySchemaUpdate } from "../schemas/companySchema.js";
 
 export class CompanyRepository {
 
@@ -15,7 +15,7 @@ export class CompanyRepository {
         return company ? company.toJSON() : null
     }
 
-    async updateCompany(companyData: CompanySchema, id: number){
+    async updateCompany(companyData: CompanySchemaUpdate, id: number){
         await Company.update({
             name: companyData.name,
             business: companyData.business,

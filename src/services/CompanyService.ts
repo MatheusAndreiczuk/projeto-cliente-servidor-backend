@@ -1,5 +1,5 @@
 import { CompanyRepository } from './../repository/CompanyRepository.ts';
-import { CompanySchema } from '../schemas/companySchema.ts';
+import { CompanySchema, CompanySchemaUpdate } from '../schemas/companySchema.ts';
 
 export class CompanyService {
 
@@ -25,7 +25,7 @@ export class CompanyService {
         return company;
     }
 
-    async updateCompany(companyData: CompanySchema, id: number){
+    async updateCompany(companyData: CompanySchemaUpdate, id: number){
         const updatedCompany = await this.repository.updateCompany(companyData, id)
         return updatedCompany
     }

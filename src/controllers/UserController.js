@@ -1,10 +1,12 @@
 import { createUserSchema, updateUserSchema } from "../schemas/userSchema.js";
 import { UserService } from "../services/UserService.js";
+import { CompanyService } from "../services/CompanyService.js";
 import bcrypt from 'bcrypt'
 
 export class UserController {
     constructor() {
         this.userService = new UserService();
+        this.companyService = new CompanyService();
     }
 
     async userExistsById(id) {
@@ -21,9 +23,10 @@ export class UserController {
             const body = { ...req.body };
             const requestData = createUserSchema.parse(body);
             const userExists = await this.userService.getUserByUsername(requestData.username)
+            const companyUsernameExists = await this.companyService.getCompanyByUsername(requestData.username)
 
-            if (userExists) {
-                return res.status(409).json({ message: "User already exists" })
+            if (userExists || companyUsernameExists) {
+                return res.status(409).json({ message: "Username already exists" })
             }
 
             const hashed = await bcrypt.hash(requestData.password, 10);

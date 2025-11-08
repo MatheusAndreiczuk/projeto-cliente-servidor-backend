@@ -1,5 +1,5 @@
-import { companySchema } from "../schemas/companySchema.ts";
-import { CompanyService } from "../services/CompanyService.ts";
+import { companySchema, CompanySchemaUpdate, companySchemaUpdate } from "../schemas/companySchema.js";
+import { CompanyService } from "../services/CompanyService.js";
 import bcrypt from 'bcrypt'
 import { Request, Response } from "express";
 import { ZodError } from "zod";
@@ -63,7 +63,7 @@ export class CompanyController {
         try {
             const body = req.body
             const companyId = (req as any).userID
-            const requestBody = companySchema.parse(body)
+            const requestBody = companySchemaUpdate.parse(body)
             const { password } = requestBody
             const passwordHashed = await bcrypt.hash(password, 10)
             requestBody.password = passwordHashed
