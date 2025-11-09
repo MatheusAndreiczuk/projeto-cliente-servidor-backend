@@ -8,6 +8,7 @@ export const createUserSchema = z.object({
     .toUpperCase(),
     username: z
     .string()
+    .regex(/[^a-zA-Z0-9]/g, "Deve conter apenas letras e/ou números")
     .min(3, "Nome de usuário deve ter no mínimo 3 caracteres")
     .max(255, "Nome de usuário deve ter no máximo 20 caracteres"),
     email: z
@@ -16,6 +17,7 @@ export const createUserSchema = z.object({
     .nullish(),
     password: z
     .string()
+    .regex(/[^a-zA-Z0-9]/g, "Deve conter apenas letras e/ou números")
     .min(3, "Senha deve ter no mínimo 3 caracteres")
     .max(20, "Senha deve ter no máximo 20 caracteres"),
     phone: z
@@ -50,6 +52,7 @@ export const updateUserSchema = z.object({
     .nullish(),
     password: z
     .string()
+    .regex(/[^a-zA-Z0-9]/g, "Deve conter apenas letras e/ou números")
     .min(3, "Senha deve ter no mínimo 3 caracteres")
     .max(20, "Senha deve ter no máximo 20 caracteres"),
     phone: z

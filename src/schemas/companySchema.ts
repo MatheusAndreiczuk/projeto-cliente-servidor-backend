@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Estados válidos do Brasil (sigla e nome completo)
 const validStates = [
     'AC', 'Acre',
     'AL', 'Alagoas',
@@ -42,11 +41,13 @@ export const companySchema = z.object({
     .max(150, "Deve ter no máximo 150 caracteres"),
     username: z
     .string()
+    .regex(/[^a-zA-Z0-9]/g, "Deve conter apenas letras e/ou números")
     .trim()
     .min(3, "Deve ter no mínimo 3 caracteres")
     .max(20, "Deve ter no máximo 20 caracteres"),
     password: z
     .string()
+    .regex(/[^a-zA-Z0-9]/g, "Deve conter apenas letras e/ou números")
     .trim()
     .min(3, "Deve ter no mínimo 3 caracteres")
     .max(20, "Deve ter no máximo 20 caracteres"),
@@ -90,6 +91,7 @@ export const companySchemaUpdate = z.object({
     .max(150, "Deve ter no máximo 150 caracteres"),
     password: z
     .string()
+    .regex(/[^a-zA-Z0-9]/g, "Deve conter apenas letras e números")
     .trim()
     .min(3, "Deve ter no mínimo 3 caracteres")
     .max(20, "Deve ter no máximo 20 caracteres"),

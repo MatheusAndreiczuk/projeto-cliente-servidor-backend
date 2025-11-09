@@ -8,7 +8,7 @@ const sequelize = new Sequelize ({
 
 async function initDatabase() {
     await import('../models/User.js');
-    await import('../models/Company.ts');
+    await import('../models/Company.js');
 
     try {
         await sequelize.authenticate();

@@ -1,12 +1,14 @@
 import { createUserSchema, updateUserSchema } from "../schemas/userSchema.js";
 import { UserService } from "../services/UserService.js";
 import { CompanyService } from "../services/CompanyService.js";
+import { CompanyRepository } from "../repository/CompanyRepository.js";
 import bcrypt from 'bcrypt'
 
 export class UserController {
     constructor() {
         this.userService = new UserService();
-        this.companyService = new CompanyService();
+        const companyRepository = new CompanyRepository();
+        this.companyService = new CompanyService(companyRepository);
     }
 
     async userExistsById(id) {

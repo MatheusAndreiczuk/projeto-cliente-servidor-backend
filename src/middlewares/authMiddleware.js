@@ -6,7 +6,7 @@ export const authMiddleware = (req, res, next) => {
     const reqToken = req.headers.authorization;
 
     if (!reqToken || !reqToken.startsWith("Bearer ")) {
-        res.status(401).json({ message: "Invalid token" })
+        return res.status(401).json({ message: "Invalid token" })
     }
 
     const token = reqToken.replace("Bearer ", "")
@@ -16,9 +16,13 @@ export const authMiddleware = (req, res, next) => {
         const decoded = jwt.verify(token, JWT_SECRET)
         if (req.method != 'POST') {
             if (decoded.sub != req.params.id) {
-                res.status(403).json({ message: "Forbidden" })
+                return res.status(403).json({ message: "Forbidden" })
             }
             req.userID = decoded.sub
+        }
+
+        if(req.originalUrl.includes('/jobs') && decoded.role != 'company'){
+            return res.status(403).json({ message: "Forbidden" })
         }
 
         next()

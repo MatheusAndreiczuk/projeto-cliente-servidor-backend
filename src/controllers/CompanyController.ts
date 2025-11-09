@@ -1,11 +1,12 @@
 import { companySchema, CompanySchemaUpdate, companySchemaUpdate } from "../schemas/companySchema.js";
 import { CompanyService } from "../services/CompanyService.js";
+import { UserService } from "../services/UserService.js";
 import bcrypt from 'bcrypt'
 import { Request, Response } from "express";
 import { ZodError } from "zod";
 
 export class CompanyController {
-    constructor (private service: CompanyService){}
+    constructor (private service: CompanyService, private userService: UserService){}
 
     async createCompany(req: Request, res: Response){
         try{
@@ -13,7 +14,8 @@ export class CompanyController {
             const requestBody = companySchema.parse(body)
 
             const company = await this.service.getCompanyByUsername(requestBody.username)
-            if(company){
+            const user = await this.userService.getUserByUsername(requestBody.username)
+            if(company || user){
                 return res.status(409).json({ message: "Username already exists" })
             }
 
@@ -34,7 +36,7 @@ export class CompanyController {
                 return res.status(422).json({
                     message: 'ValidationError',
                     code: 'UNPROCESSABLE',
-                    details: error.issues?.map(i => ({ path: i.path.join('.'), message: i.message })) || []
+                    details: error.issues?.map(i => ({ field: i.path.join('.'), message: i.message })) || []
                 });
             }
             return res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error" })
@@ -85,7 +87,7 @@ export class CompanyController {
                 return res.status(422).json({
                     message: 'ValidationError',
                     code: 'UNPROCESSABLE',
-                    details: error.issues?.map(i => ({ path: i.path.join('.'), message: i.message })) || []
+                    details: error.issues?.map(i => ({ field: i.path.join('.'), message: i.message })) || []
                 });
             }
             return res.status(500).json({ message: (error as Error).message })

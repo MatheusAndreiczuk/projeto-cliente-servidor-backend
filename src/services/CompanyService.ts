@@ -1,5 +1,5 @@
-import { CompanyRepository } from './../repository/CompanyRepository.ts';
-import { CompanySchema, CompanySchemaUpdate } from '../schemas/companySchema.ts';
+import { CompanyRepository } from './../repository/CompanyRepository.js';
+import { CompanySchema, CompanySchemaUpdate } from '../schemas/companySchema.js';
 
 export class CompanyService {
 

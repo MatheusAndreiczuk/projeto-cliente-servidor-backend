@@ -1,6 +1,7 @@
 import express from 'express';
 import { CompanyController } from '../controllers/CompanyController.js';
 import { CompanyService } from '../services/CompanyService.js';
+import { UserService } from '../services/UserService.js';
 import { CompanyRepository } from '../repository/CompanyRepository.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 
@@ -8,7 +9,8 @@ const router = express.Router();
 
 const companyRepository = new CompanyRepository();
 const companyService = new CompanyService(companyRepository);
-const companyController = new CompanyController(companyService);
+const userService = new UserService()
+const companyController = new CompanyController(companyService, userService);
 
 router.post('/companies', companyController.createCompany.bind(companyController))
 router.get('/companies/:id', authMiddleware, companyController.getCompanyById.bind(companyController))
