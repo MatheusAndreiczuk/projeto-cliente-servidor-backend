@@ -41,16 +41,14 @@ export const companySchema = z.object({
     .max(150, "Deve ter no máximo 150 caracteres"),
     username: z
     .string()
-    .regex(/[^a-zA-Z0-9]/g, "Deve conter apenas letras e/ou números")
-    .trim()
     .min(3, "Deve ter no mínimo 3 caracteres")
-    .max(20, "Deve ter no máximo 20 caracteres"),
+    .max(20, "Deve ter no máximo 20 caracteres")
+    .regex(/^[a-zA-Z0-9]+$/, "Deve conter apenas letras e números, sem espaços ou caracteres especiais"),
     password: z
     .string()
-    .regex(/[^a-zA-Z0-9]/g, "Deve conter apenas letras e/ou números")
-    .trim()
     .min(3, "Deve ter no mínimo 3 caracteres")
-    .max(20, "Deve ter no máximo 20 caracteres"),
+    .max(20, "Deve ter no máximo 20 caracteres")
+    .regex(/^[a-zA-Z0-9]+$/, "Deve conter apenas letras e números, sem espaços ou caracteres especiais"),
     street: z
     .string()
     .min(1, "Deve ter no mínimo 3 caracteres")
@@ -91,10 +89,9 @@ export const companySchemaUpdate = z.object({
     .max(150, "Deve ter no máximo 150 caracteres"),
     password: z
     .string()
-    .regex(/[^a-zA-Z0-9]/g, "Deve conter apenas letras e números")
-    .trim()
     .min(3, "Deve ter no mínimo 3 caracteres")
-    .max(20, "Deve ter no máximo 20 caracteres"),
+    .max(20, "Deve ter no máximo 20 caracteres")
+    .regex(/^[a-zA-Z0-9]+$/, "Deve conter apenas letras e números, sem espaços ou caracteres especiais"),
     street: z
     .string()
     .min(1, "Deve ter no mínimo 3 caracteres")

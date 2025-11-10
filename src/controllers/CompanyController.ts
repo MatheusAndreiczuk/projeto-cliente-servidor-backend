@@ -11,6 +11,7 @@ export class CompanyController {
     async createCompany(req: Request, res: Response){
         try{
             const body = req.body
+            console.log("Received request body for creating company:", body);
             const requestBody = companySchema.parse(body)
 
             const company = await this.service.getCompanyByUsername(requestBody.username)
@@ -20,7 +21,7 @@ export class CompanyController {
             }
 
             const companyByName = await this.service.getCompanyByName(requestBody.name)
-            if (companyByName && companyByName.name == requestBody.name) {
+            if (companyByName) {
                 return res.status(409).json({ message: "Company name already exists" });
             }
 
@@ -71,8 +72,16 @@ export class CompanyController {
             requestBody.password = passwordHashed
 
             const companyExists = await this.service.getCompanyById(companyId)
+
             if(!companyExists){
                 return res.status(404).json({ message: "Company not found "})
+            }
+
+            if(requestBody.name && requestBody.name !== companyExists.name){
+                const companyByName = await this.service.getCompanyByName(requestBody.name)
+                if(companyByName){
+                    return res.status(409).json({ message: "Company name already exists" })
+                }
             }
 
             const result = await this.service.updateCompany(requestBody, companyId)
