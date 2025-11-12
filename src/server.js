@@ -7,6 +7,7 @@ import express from "express";
 import router from "./routes/index.js";
 import cors from "cors";
 import { dbReady } from './database/db.js';
+import logMiddleware from "./middlewares/logMiddleware.js";
 
 await dbReady;
 
@@ -14,6 +15,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(logMiddleware);
 app.use(router)
 
 app.listen(22000, () => {

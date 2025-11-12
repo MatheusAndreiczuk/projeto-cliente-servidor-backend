@@ -37,7 +37,7 @@ export class CompanyController {
                 return res.status(422).json({
                     message: 'ValidationError',
                     code: 'UNPROCESSABLE',
-                    details: error.issues?.map(i => ({ field: i.path.join('.'), message: i.message })) || []
+                    details: error.issues?.map(i => ({ field: i.path.join('.'), error: i.message })) || []
                 });
             }
             return res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error" })
@@ -96,7 +96,7 @@ export class CompanyController {
                 return res.status(422).json({
                     message: 'ValidationError',
                     code: 'UNPROCESSABLE',
-                    details: error.issues?.map(i => ({ field: i.path.join('.'), message: i.message })) || []
+                    details: error.issues?.map(i => ({ field: i.path.join('.'), error: i.message })) || []
                 });
             }
             return res.status(500).json({ message: (error as Error).message })

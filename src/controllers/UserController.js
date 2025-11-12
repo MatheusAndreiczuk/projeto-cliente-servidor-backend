@@ -41,7 +41,7 @@ export class UserController {
                 return res.status(422).json({
                     message: 'ValidationError',
                     code: 'UNPROCESSABLE',
-                    details: error.issues?.map(i => ({ path: i.path.join('.'), message: i.message })) || []
+                    details: error.issues?.map(i => ({ path: i.path.join('.'), error: i.message })) || []
                 });
             }
             console.error('createUser error:', error);
@@ -88,7 +88,7 @@ export class UserController {
                 return res.status(422).json({
                     message: 'ValidationError',
                     code: 'UNPROCESSABLE',
-                    details: error.issues?.map(i => ({ path: i.path.join('.'), message: i.message })) || []
+                    details: error.issues?.map(i => ({ path: i.path.join('.'), error: i.message })) || []
                 });
             }
             return res.status(500).json({ message: error.message })
