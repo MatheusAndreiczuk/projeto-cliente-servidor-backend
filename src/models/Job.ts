@@ -1,4 +1,4 @@
-import { DataTypes, Sequelize } from "sequelize";
+import { DataTypes } from "sequelize";
 import database from '../database/db.js'
 import Company from "./Company.js";
 
@@ -20,7 +20,15 @@ export const Job = database.define("Job", {
         type: DataTypes.STRING,
         allowNull: false
     },
-    location: {
+    state: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    city: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    contact: {
         type: DataTypes.STRING,
         allowNull: false
     },

@@ -1,8 +1,6 @@
 import z from 'zod'
 
 export const createJobSchema = z.object({
-    name: z
-        .string(),
     title: z
         .string()
         .min(3)
@@ -13,12 +11,21 @@ export const createJobSchema = z.object({
         .max(5000),
     area: z
         .string(),
-    location: z
-        .string(),
-    contact: z
-        .string(),
-    salary: z
+    state: z
         .string()
+        .min(2)
+        .max(50),
+    city: z
+        .string()
+        .min(2)
+        .max(100),
+    contact: z
+        .string()
+        .min(3)
+        .max(255)
+        .optional(),
+    salary: z
+        .number()
         .optional()
 })
 

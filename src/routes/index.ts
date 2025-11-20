@@ -1,6 +1,7 @@
 import express from 'express';
 import userRoutes from './userRoutes.js';
 import companyRoutes from './companyRoutes.js';
+import jobRoutes from './jobRoutes.js';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
 import { LoginController } from '../controllers/LoginController.js';
 import { UserService } from '../services/UserService.js';
@@ -21,5 +22,7 @@ router.post('/login', loginController.login.bind(loginController));
 router.use(userRoutes);
 
 router.use(companyRoutes);
+
+router.use(jobRoutes);
 
 export default router;
