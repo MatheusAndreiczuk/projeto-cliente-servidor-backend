@@ -10,7 +10,7 @@ import { ApplicationService } from '../services/ApplicationService.js';
 import { ApplicationRepository } from '../repository/ApplicationRepository.js';
 import { FeedbackController } from '../controllers/FeedbackController.js';
 import { FeedbackService } from '../services/FeedbackService.js';
-import { FeedbackRepository } from '../repository/FeedbackRepository';
+import { FeedbackRepository } from '../repository/FeedbackRepository.js';
 
 const router = express.Router();
 
