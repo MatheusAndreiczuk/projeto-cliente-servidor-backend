@@ -42,10 +42,12 @@ export const Job = database.define("Job", {
 })
 
 Job.belongsTo(Company, {
-    foreignKey: 'companyId'
+    foreignKey: 'companyId',
+    onDelete: "CASCADE"
 })
 Company.hasMany(Job, {
-    foreignKey: 'companyId'
+    foreignKey: 'companyId',
+    onDelete: "CASCADE"
 })
 
 export default Job

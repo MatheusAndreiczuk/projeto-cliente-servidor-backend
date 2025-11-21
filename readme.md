@@ -1,111 +1,240 @@
-# Projeto - Backend Cliente-Servidor (Express + Sequelize + SQLite)
+# JobConnect API - Sistema de Gestão de Vagas
 
-Este repositório contém um backend em Node.js/TypeScript usando Express, Sequelize e SQLite.
+<div align="center">
 
-Este README descreve como rodar o projeto a partir de um arquivo .zip que NÃO contém as pastas listadas em `.gitignore` (por exemplo `node_modules` e `dist`).
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express.js-404D59?style=for-the-badge&logo=express&logoColor=white)
+![Sequelize](https://img.shields.io/badge/Sequelize-52B0E7?style=for-the-badge&logo=sequelize&logoColor=white)
+![SQLite](https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)
 
-## Pré-requisitos
+**API REST para conectar empresas e candidatos em um ecossistema completo de gestão de vagas de emprego.**
 
-- Node.js (recomenda-se Node 18+)
-- npm (vem com o Node.js)
+[Funcionalidades](#-funcionalidades) • [Tecnologias](#-tecnologias) • [Arquitetura](#-arquitetura) • [Instalação](#-instalação)
 
-## Passos para rodar (Windows / PowerShell)
-
-1. Baixe e extraia o arquivo .zip do projeto. O .zip NÃO contém `node_modules` nem `dist`.
-
-   - Usando o Explorador do Windows: clique com o botão direito -> Extrair Tudo...
-   - Ou via PowerShell (exemplo):
-
-```powershell
-# ajustando nomes conforme seu arquivo
-Expand-Archive -Path .\projeto-backend.zip -DestinationPath .\projeto-backend
-cd .\projeto-backend\projeto-cliente-servidor-backend-main
-```
-
-2. Entre na pasta do projeto:
-
-```powershell
-cd .\projeto-cliente-servidor-backend-main
-```
-
-3. Instale as dependências (já que `node_modules` não veio no zip):
-
-```powershell
-npm install
-```
-
-4. Crie o arquivo de variáveis de ambiente a partir do exemplo fornecido:
-
-```powershell
-Copy-Item .env.example .env
-# ou, se preferir editar manualmente, abra .env.example e crie .env com as mesmas variáveis
-```
-
-5. Build (TypeScript -> JavaScript):
-
-```powershell
-npm run build
-```
-
-6. Rodar a aplicação:
-
-- Em modo "dev" (faz build e executa):
-
-```powershell
-npm run dev
-```
-
-- Em produção (assumindo que já fez `npm run build`):
-
-```powershell
-npm start
-```
-
-7. A API deverá estar disponível no endereço e porta configurados no código (ver `src/server.js` ou `dist/server.js` após build). Se a porta estiver hardcoded, confira esse arquivo para o valor exato.
-
-## Variáveis de ambiente
-
-O projeto traz um arquivo `.env.example` com pelo menos as variáveis:
-
-- `JWT_SECRET` - segredo para geração de tokens JWT
-- `JWT_EXPIRES_IN` - tempo de expiração do token (em segundos)
-
-Copie essas variáveis para `.env` e ajuste conforme necessário.
-
-## Banco de dados
-
-Este projeto usa `sqlite3` via Sequelize. Normalmente não é necessário criar manualmente o arquivo de banco de dados — ele será criado automaticamente quando a aplicação inicializar e executar operações/seed/migrations (se houver suporte no código). Se encontrar problemas relacionados ao DB, verifique o arquivo `src/database/db.js`.
-
-## Erros comuns / Troubleshooting
-
-- Erro: "module not found" após descompactar o zip — execute `npm install`.
-- Erro: problemas com TypeScript/compilação — verifique se o `tsc` está instalado (está como dependência do projeto) e rode `npm run build` para gerar `dist/`.
-- Erro ao iniciar após build — confira se `dist/server.js` existe; se não existir, rode `npm run build` e verifique mensagens de erro no terminal.
-- Porta em uso — ajuste a porta no arquivo de configuração/servidor ou pare o processo que está usando a porta.
-
-## Comandos úteis
-
-```powershell
-# instalar dependências
-npm install
-
-# copiar variáveis de ambiente (PowerShell)
-Copy-Item .env.example .env
-
-# build
-npm run build
-
-# rodar em dev
-npm run dev
-
-# rodar em produção
-npm start
-```
-
-## Observações sobre o zip
-
-O .zip fornecido para entrega normalmente não inclui `node_modules` nem `dist` (esses arquivos são listados em `.gitignore`). Por isso, após extrair, é obrigatório executar `npm install` e `npm run build` antes de tentar executar o projeto.
+</div>
 
 ---
 
-Arquivo criado automaticamente por assistente com instruções para rodar o projeto no Windows (PowerShell).
+## Sobre o Projeto
+
+O **JobConnect API** é um sistema backend completo desenvolvido para gerenciar todo o ciclo de vida de vagas de emprego, desde a publicação até o feedback final aos candidatos. Com uma arquitetura em camadas bem definida, este projeto demonstra boas práticas de desenvolvimento backend moderno.
+
+### Problema Resolvido
+
+- **Para Empresas**: Plataforma centralizada para publicar vagas, gerenciar candidaturas e enviar feedbacks personalizados
+- **Para Candidatos**: Sistema intuitivo para buscar vagas, candidatar-se e receber retorno sobre suas aplicações
+- **Segurança**: Autenticação JWT robusta com controle de acesso baseado em roles (empresa/usuário)
+
+---
+
+## Limitações e Contexto Técnico
+
+Apesar de totalmente funcional, o projeto ainda passará por melhorias tanto na interface quanto no backend.
+
+- **O projeto foi desenvolvido seguindo o protocolo de comunicação xlxs que encontra-se na pasta raiz do repositório e devidamente identificado, com o objetivo de garantir que o backend e o frontend tenham plena comunicação e evitando problemas.**
+
+- **Tal protocolo foi construído pela própria turma da disciplina Cliente-Servidor, não representando necessariamente as melhores práticas e um protocolo de comunicação backend-frontend profissional.**
+
+- **Este projeto foi desenvolvido considerando as limitações de infraestrutura dos laboratórios da UTFPR, onde será apresentado:**
+
+### Restrições do Ambiente
+
+- **Node.js 18.14.0:** Versão fixa instalada nos laboratórios, impedindo o uso de recursos mais recentes
+- **Sem Banco de Dados:** Ausência de SGBD (MySQL, PostgreSQL, MongoDB) instalados
+- **Sem Docker:** Impossibilidade de containerização e orquestração de serviços
+- **Hardware Limitado:** Recursos computacionais restritos para execução de serviços pesados
+
+### Decisões Arquiteturais
+
+Devido às limitações acima, o projeto foi estruturado com:
+
+- **Utilização do SQLite como banco de dados:** Dados armazenados com SQLite que independe de instalação prévia nos computadores dos laboratórios
+- **Tecnologias Leves:** Escolha de bibliotecas e frameworks com baixo overhead
+- **Compatibilidade com Node 18.14:** Código e dependências compatíveis com versões antigas do Node.js
+- **Sem Containerização:** Não utilização de Docker/Kubernetes
+
+### Considerações
+
+Em um ambiente de produção real, as seguintes melhorias seriam implementadas:
+
+- Migração para banco de dados relacional mais robusto e escalável (PostgreSQL) ou NoSQL (MongoDB)
+- Containerização com Docker para facilitar deploy e escalabilidade
+- Utilização de Node.js mais recente com recursos modernos
+- Implementação de cache com Redis
+- Possível deploy em plataformas cloud (AWS, Azure, GCP)
+- CI/CD automatizado com testes integrados
+
+---
+
+## Funcionalidades
+
+### Gestão de Usuários
+- Cadastro e autenticação de candidatos
+- Perfil completo com experiência profissional e educação
+- Atualização de dados pessoais
+- Visualização de candidaturas com status e feedback
+
+### Gestão de Empresas
+- Cadastro e autenticação de empresas
+- Perfil corporativo com informações de contato
+- Gerenciamento de múltiplas vagas
+- Visualização de candidatos por vaga
+
+### Gestão de Vagas
+- Criação e edição de vagas de emprego
+- Busca avançada com filtros (área, localização, salário)
+- Associação automática com empresa
+- Controle de candidaturas recebidas
+
+### Sistema de Candidaturas
+- Candidatura simplificada a vagas
+- Prevenção de candidaturas duplicadas
+- Histórico completo de candidaturas
+- Dados detalhados do candidato
+
+### Sistema de Feedback
+- Empresas podem enviar feedback aos candidatos
+- Candidatos visualizam feedback em suas candidaturas
+- Histórico de feedbacks por vaga
+- Melhora na experiência do candidato
+
+---
+
+## 🛠 Tecnologias
+
+### Core
+- **Node.js** 
+- **TypeScript** 
+- **Express.js** 
+
+### Banco de Dados
+- **Sequelize ORM** 
+- **SQLite** 
+
+### Segurança & Validação
+- **JWT (jsonwebtoken)** - Autenticação stateless
+- **bcrypt** - Hash de senhas
+- **Zod** - Validação de schemas TypeScript-first
+
+### Ferramentas
+- **CORS** - Cross-Origin Resource Sharing
+- **dotenv** - Gerenciamento de variáveis de ambiente
+
+---
+
+## 🏗 Arquitetura
+
+O projeto segue o padrão **MVC aprimorado** com separação clara de responsabilidades:
+
+```
+src/
+├── controllers/      # Camada de controle (lida com requisições HTTP)
+├── services/         # Camada de negócio (lógica da aplicação)
+├── repository/       # Camada de dados (acesso ao banco)
+├── models/           # Modelos Sequelize (definição de tabelas)
+├── schemas/          # Schemas Zod (validação de entrada)
+├── routes/           # Definição de rotas e injeção de dependências
+├── middlewares/      # Autenticação, logging, tratamento de erros
+├── database/         # Configuração do banco de dados
+└── @types/           # Definições TypeScript customizadas
+```
+
+### Padrões Implementados
+
+- **Dependency Injection**: Injeção via construtor para facilitar testes
+- **Repository Pattern**: Abstração do acesso a dados
+- **DTO Pattern**: Validação com Zod schemas
+- **JWT Authentication**: Autenticação stateless moderna
+
+---
+
+## Instalação
+
+### Pré-requisitos
+
+- Node.js 18+ instalado
+- npm ou yarn
+
+### Passo a Passo
+
+1. **Clone o repositório**
+```bash
+git clone https://github.com/MatheusAndreiczuk/projeto-cliente-servidor-backend.git
+cd projeto-cliente-servidor-backend
+```
+
+2. **Instale as dependências**
+```bash
+npm install
+```
+
+3. **Configure as variáveis de ambiente**
+
+Crie um arquivo `.env` na raiz do projeto:
+```env
+PORT=3000
+JWT_SECRET=seu_secret_super_seguro_aqui
+NODE_ENV=development
+```
+
+4. **Compile o TypeScript**
+```bash
+npm run build
+```
+
+5. **Inicie o servidor**
+```bash
+npm run dev
+```
+
+O servidor estará rodando em `http://localhost:3000` 🎉
+
+---
+
+## Autenticação e Autorização
+
+O sistema implementa **JWT (JSON Web Token)** com controle de acesso baseado em roles:
+
+### Fluxo de Autenticação
+
+1. **Login**: Usuário/Empresa faz login e recebe um token JWT
+2. **Token**: Token contém `id`, `role` (user/company) e expira em 24h
+3. **Autorização**: Middleware valida token e verifica permissões
+
+### Regras de Acesso
+
+| Endpoint | Role Permitido | Validação Adicional |
+|----------|----------------|---------------------|
+| `POST /users` | Público | - |
+| `GET /users/:id` | user | Apenas próprio usuário |
+| `GET /users/:user_id/jobs` | user | Apenas próprias candidaturas |
+| `POST /companies` | Público | - |
+| `POST /jobs` | company | Apenas empresa autenticada |
+| `POST /jobs/:id` | user | Usuário autenticado |
+| `POST /jobs/:job_id/feedback` | company | Apenas empresa dona da vaga |
+
+---
+
+## Melhorias Futuras
+
+- [ ] Testes automatizados (Jest/Supertest)
+- [ ] Documentação Swagger/OpenAPI
+- [ ] Paginação de resultados
+- [ ] Upload de currículos (PDF)
+- [ ] Sistema de notificações (email)
+- [ ] Métricas e monitoramento
+- [ ] Rate limiting
+- [ ] Cache com Redis
+- [ ] Migração para PostgreSQL
+- [ ] Docker containerization
+
+---
+
+
+<div align="center">
+
+**⭐ Se gostou do projeto, considere dar uma estrela!**
+
+</div>

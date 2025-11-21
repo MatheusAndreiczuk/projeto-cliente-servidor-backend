@@ -36,7 +36,8 @@ export const Application = database.define("Application", {
         references: {
             model: User,
             key: 'id'
-        }
+        },
+        onDelete: "CASCADE"
     },
     jobId: {
         type: DataTypes.INTEGER,
@@ -44,14 +45,17 @@ export const Application = database.define("Application", {
         references: {
             model: Job,
             key: 'id'
-        }
+        },
+        onDelete: "CASCADE"
     }
 }, {
     createdAt: true,
     updatedAt: false
 });
 
-Application.belongsTo(User, { foreignKey: 'userId' })
-Application.belongsTo(Job, { foreignKey: 'jobId' })
+Application.belongsTo(User, { foreignKey: 'userId', onDelete: 'CASCADE' })
+Application.belongsTo(Job, { foreignKey: 'jobId', onDelete: 'CASCADE' })
+User.hasMany(Application, { foreignKey: 'userId', onDelete: 'CASCADE' })
+Job.hasMany(Application, { foreignKey: 'jobId', onDelete: 'CASCADE' })
 
 export default Application

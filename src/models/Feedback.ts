@@ -21,7 +21,8 @@ export const Feedback = database.define("Feedback", {
         references: {
             model: User,
             key: 'id'
-        }
+        },
+        onDelete: "CASCADE"
     },
     jobId: {
         type: DataTypes.INTEGER,
@@ -29,7 +30,8 @@ export const Feedback = database.define("Feedback", {
         references: {
             model: Job,
             key: 'id'
-        }
+        },
+        onDelete: "CASCADE"
     },
     companyId: {
         type: DataTypes.INTEGER,
@@ -37,15 +39,19 @@ export const Feedback = database.define("Feedback", {
         references: {
             model: Company,
             key: 'id'
-        }
+        },
+        onDelete: "CASCADE"
     }
 }, {
     createdAt: true,
     updatedAt: false
 });
 
-Feedback.belongsTo(User, { foreignKey: 'userId' })
-Feedback.belongsTo(Job, { foreignKey: 'jobId' })
-Feedback.belongsTo(Company, { foreignKey: 'companyId' })
+Feedback.belongsTo(User, { foreignKey: 'userId', onDelete: 'CASCADE' })
+Feedback.belongsTo(Job, { foreignKey: 'jobId', onDelete: 'CASCADE' })
+Feedback.belongsTo(Company, { foreignKey: 'companyId', onDelete: 'CASCADE' })
+User.hasMany(Feedback, { foreignKey: 'userId', onDelete: 'CASCADE' })
+Job.hasMany(Feedback, { foreignKey: 'jobId', onDelete: 'CASCADE' })
+Company.hasMany(Feedback, { foreignKey: 'companyId', onDelete: 'CASCADE' })
 
 export default Feedback
