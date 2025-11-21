@@ -15,19 +15,29 @@ export class JobService {
         return job ? job.toJSON() : null;
     }
 
-    async getAllJobs(filters: IJobFilters) {
-        const jobs = await this.repository.getAllJobs(filters);
-        return jobs.map(job => job.toJSON());
+    async getAllJobs(filters?: IJobFilters) {
+        try {
+            const jobs = await this.repository.getAllJobs(filters);
+            return jobs.map(job => job.toJSON());
+        } catch (error) {
+            console.error('JobService.getAllJobs error', (error as Error).message);
+            throw error;
+        }
     }
 
-    async getJobsByCompanyId(filters: IJobFilters, companyId: number) {
-        const jobs = await this.repository.getJobsByCompany(filters, companyId);
-        return jobs.map(job => job.toJSON());
+    async getJobsByCompanyId(filters: IJobFilters | undefined, companyId: number) {
+        try {
+            const jobs = await this.repository.getJobsByCompany(filters, companyId);
+            return jobs.map(job => job.toJSON());
+        } catch (error) {
+            console.error('JobService.getJobsByCompanyId error', (error as Error).message);
+            throw error;
+        }
     }
 
     async updateJob(jobData: CreateJobSchema, idJob: number) {
         const updatedJob = await this.repository.updateJob(jobData, idJob);
-        return updatedJob.toJSON();
+        return updatedJob ? updatedJob.toJSON() : null;
     }
 
     async deleteJob(jobId: number) {
