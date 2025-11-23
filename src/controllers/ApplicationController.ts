@@ -59,37 +59,9 @@ export class ApplicationController {
     try {
       const userId = parseInt(req.params.user_id)
 
-      const applications = await this.applicationService.getApplicationsByUser(userId)
+      const items = await this.applicationService.getUserApplicationsWithDetails(userId, this.feedbackService)
 
-      const items = await Promise.all(
-        applications.map(async (app: any) => {
-          const job = app.Job
-          if (!job) return null
-
-          const companyName = job.Company?.name ?? null
-          const contact = job.contact ?? job.Company?.email ?? null
-
-          const feedbacks = await this.feedbackService.getFeedbacksByJobAndUser(job.id, userId)
-          const latestFeedback = feedbacks.length > 0 ? feedbacks[0].message : null
-
-          return {
-            job_id: job.id,
-            title: job.title,
-            area: job.area,
-            company: companyName,
-            description: job.description,
-            state: job.state,
-            city: job.city,
-            salary: job.salary,
-            contact: contact,
-            feedback: latestFeedback,
-          }
-        })
-      )
-
-      const validItems = items.filter((item) => item !== null)
-
-      return res.status(200).json({ items: validItems })
+      return res.status(200).json({ items })
     } catch (error) {
       console.error("Error fetching user applications:", error)
       return res.status(500).json({ message: "Internal server error" })
@@ -102,28 +74,23 @@ export class ApplicationController {
       const jobId = parseInt(req.params.job_id)
       const loggedCompanyId = (req as any).userID
 
-      const job = await this.jobService.getJobById(jobId)
-      if (!job) {
-        return res.status(404).json({ message: "Job not found" })
-      }
-
-      if (job.companyId !== loggedCompanyId || companyId !== loggedCompanyId) {
-        return res.status(403).json({ message: "Forbidden" })
-      }
-
-      const applications = await this.applicationService.getApplicationsByJob(jobId)
-
-      const items = applications.map((app: any) => ({
-        user_id: app.userId,
-        name: app.name,
-        email: app.email || null,
-        phone: app.phone || null,
-        education: app.education,
-        experience: app.experience,
-      }))
+      const items = await this.applicationService.getJobApplicationsWithValidation(
+        jobId,
+        companyId,
+        loggedCompanyId,
+        this.jobService
+      )
 
       return res.status(200).json({ items })
     } catch (error) {
+      if (error instanceof Error) {
+        if (error.message === "Job not found") {
+          return res.status(404).json({ message: "Job not found" })
+        }
+        if (error.message === "Forbidden") {
+          return res.status(403).json({ message: "Forbidden" })
+        }
+      }
       console.error("Error fetching job applications:", error)
       return res.status(500).json({ message: "Internal server error" })
     }

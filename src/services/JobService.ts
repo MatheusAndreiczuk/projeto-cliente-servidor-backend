@@ -44,4 +44,40 @@ export class JobService {
         const message = await this.repository.deleteJob(jobId);
         return message;
     }
+
+    mapJobToResponse(job: any) {
+        const companyName = job.Company?.name ?? null;
+        const contact = job.contact ?? job.Company?.email ?? null;
+        return {
+            job_id: job.id,
+            title: job.title,
+            area: job.area,
+            company: companyName,
+            description: job.description,
+            state: job.state,
+            city: job.city,
+            salary: job.salary,
+            contact: contact
+        }
+    }
+
+    async getAllJobsMapped(filters?: IJobFilters) {
+        try {
+            const jobs = await this.repository.getAllJobs(filters);
+            return jobs.map(job => this.mapJobToResponse(job.toJSON()));
+        } catch (error) {
+            console.error('JobService.getAllJobsMapped error', (error as Error).message);
+            throw error;
+        }
+    }
+
+    async getJobsByCompanyIdMapped(filters: IJobFilters | undefined, companyId: number) {
+        try {
+            const jobs = await this.repository.getJobsByCompany(filters, companyId);
+            return jobs.map(job => this.mapJobToResponse(job.toJSON()));
+        } catch (error) {
+            console.error('JobService.getJobsByCompanyIdMapped error', (error as Error).message);
+            throw error;
+        }
+    }
 }

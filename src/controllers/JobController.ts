@@ -49,26 +49,10 @@ export class JobController {
     async getAllJobs(req: Request, res: Response) {
         try {
             const filters = this.extractFilters(req);
-            const jobs = await this.service.getAllJobs(filters)
-            if (!jobs) {
+            const items = await this.service.getAllJobsMapped(filters)
+            if (!items) {
                 return res.status(404).json({ message: "Jobs not found" })
             }
-
-            const items = jobs.map((j: any) => {
-                const companyName = j.Company?.name ?? null;
-                const contact = j.contact ?? j.Company?.email ?? null;
-                return {
-                    job_id: j.id,
-                    title: j.title,
-                    area: j.area,
-                    company: companyName,
-                    description: j.description,
-                    state: j.state,
-                    city: j.city,
-                    salary: j.salary,
-                    contact: contact
-                }
-            })
 
             return res.status(200).json({ items })
         } catch (error) {
@@ -84,20 +68,7 @@ export class JobController {
                 return res.status(404).json({ message: "Job not found" })
             }
 
-            const companyName = job.Company?.name ?? null;
-            const contact = job.contact ?? job.Company?.email ?? null;
-
-            const items = {
-                job_id: job.id,
-                title: job.title,
-                area: job.area,
-                company: companyName,
-                description: job.description,
-                state: job.state,
-                city: job.city,
-                salary: job.salary,
-                contact: contact
-            }
+            const items = this.service.mapJobToResponse(job)
 
             return res.status(200).json({ items })
         } catch (error) {
@@ -109,26 +80,10 @@ export class JobController {
         try {
             const companyId = (req as any).userID
             const filters = this.extractFilters(req);
-            const jobs = await this.service.getJobsByCompanyId(filters, companyId)
-            if (!jobs) {
+            const items = await this.service.getJobsByCompanyIdMapped(filters, companyId)
+            if (!items) {
                 return res.status(404).json({ message: "Jobs not found" })
             }
-
-            const items = jobs.map((j: any) => {
-                const companyName = j.Company?.name ?? null;
-                const contact = j.contact ?? j.Company?.email ?? null;
-                return {
-                    job_id: j.id,
-                    title: j.title,
-                    area: j.area,
-                    company: companyName,
-                    description: j.description,
-                    state: j.state,
-                    city: j.city,
-                    salary: j.salary,
-                    contact: contact
-                }
-            })
 
             return res.status(200).json({ items })
         } catch (error) {

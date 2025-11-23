@@ -1,7 +1,5 @@
 import jwt from "jsonwebtoken"
 
-const JWT_SECRET = "93685f132a9d5691c421c4522b543eb0a8e16521be9e7028786c0b5a6d9488c4"
-
 export const authMiddleware = (req, res, next) => {
     const reqToken = req.headers.authorization;
 
@@ -11,6 +9,13 @@ export const authMiddleware = (req, res, next) => {
 
     const token = reqToken.replace("Bearer ", "")
     // ou reqToken.split(" ")[1]
+
+    const JWT_SECRET = process.env.JWT_SECRET;
+    
+    if (!JWT_SECRET) {
+        console.error("JWT_SECRET not configured in environment variables")
+        return res.status(500).json({ message: "Server configuration error" })
+    }
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET)

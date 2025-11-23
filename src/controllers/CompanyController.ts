@@ -1,7 +1,6 @@
 import { companySchema, CompanySchemaUpdate, companySchemaUpdate } from "../schemas/companySchema.js";
 import { CompanyService } from "../services/CompanyService.js";
 import { UserService } from "../services/UserService.js";
-import bcrypt from 'bcrypt'
 import { Request, Response } from "express";
 import { ZodError } from "zod";
 
@@ -14,21 +13,7 @@ export class CompanyController {
             console.log("Received request body for creating company:", body);
             const requestBody = companySchema.parse(body)
 
-            const company = await this.service.getCompanyByUsername(requestBody.username)
-            const user = await this.userService.getUserByUsername(requestBody.username)
-            if(company || user){
-                return res.status(409).json({ message: "Username already exists" })
-            }
-
-            const companyByName = await this.service.getCompanyByName(requestBody.name)
-            if (companyByName) {
-                return res.status(409).json({ message: "Company name already exists" });
-            }
-
-            const hashedPassword = await bcrypt.hash(requestBody.password, 10)
-            requestBody.password = hashedPassword
-
-            const createdUser = await this.service.createCompany(requestBody)
+            const createdUser = await this.service.createCompany(requestBody, this.userService)
             if(createdUser){
                 return res.status(201).json({ message: "Created" })
             }
@@ -39,6 +24,14 @@ export class CompanyController {
                     code: 'UNPROCESSABLE',
                     details: error.issues?.map(i => ({ field: i.path.join('.'), error: i.message })) || []
                 });
+            }
+            if(error instanceof Error){
+                if(error.message === "Username already exists"){
+                    return res.status(409).json({ message: `${error.message}` })
+                }
+                if(error.message === "Company name already exists"){
+                    return res.status(409).json({ message: `${error.message}` })
+                }
             }
             return res.status(500).json({ message: error instanceof Error ? error.message : "Internal Server Error" })
         }
@@ -67,22 +60,6 @@ export class CompanyController {
             const body = req.body
             const companyId = (req as any).userID
             const requestBody = companySchemaUpdate.parse(body)
-            const { password } = requestBody
-            const passwordHashed = await bcrypt.hash(password, 10)
-            requestBody.password = passwordHashed
-
-            const companyExists = await this.service.getCompanyById(companyId)
-
-            if(!companyExists){
-                return res.status(404).json({ message: "Company not found "})
-            }
-
-            if(requestBody.name && requestBody.name !== companyExists.name){
-                const companyByName = await this.service.getCompanyByName(requestBody.name)
-                if(companyByName){
-                    return res.status(409).json({ message: "Company name already exists" })
-                }
-            }
 
             const result = await this.service.updateCompany(requestBody, companyId)
 
@@ -98,6 +75,14 @@ export class CompanyController {
                     code: 'UNPROCESSABLE',
                     details: error.issues?.map(i => ({ field: i.path.join('.'), error: i.message })) || []
                 });
+            }
+            if(error instanceof Error){
+                if(error.message === "Company not found"){
+                    return res.status(404).json({ message: `${error.message}` })
+                }
+                if(error.message === "Company name already exists"){
+                    return res.status(409).json({ message: `${error.message}` })
+                }
             }
             return res.status(500).json({ message: (error as Error).message })
         }
